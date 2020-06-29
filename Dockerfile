@@ -11,7 +11,7 @@ RUN apk update && \
     apk upgrade && \
     apk add --no-cache build-base libxml2-dev libxslt-dev openssl ca-certificates wget && \
     update-ca-certificates && \
-    gem install websocket-client-simple bundler sass nokogiri && \
+    gem install websocket-client-simple bundler sass nokogiri:1.5.0 && \
     mkdir -p $MJAI_HOME && \
     wget -O - $MJAI_SOURCE | tar zxf - mahjong-server-master/mjai -C $MJAI_HOME --strip-components=2
 
