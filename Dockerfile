@@ -9,11 +9,9 @@ EXPOSE 11600
 
 RUN apk update && \
     apk upgrade && \
-    apk add --no-cache build-base libxml2-dev libxslt-dev openssl ca-certificates wget && \
+    apk add --no-cache build-base libxml2-dev libxslt-dev openssl ca-certificates wget build-essential patch zlib1g-dev liblzma-dev && \
     update-ca-certificates && \
-    apk add --no-cache gmp-dev && \
-    gem install nokogiri -- --use-system-libraries && \
-    gem install websocket-client-simple bundler sass && \
+    gem install websocket-client-simple bundler sass nokogiri && \
     mkdir -p $MJAI_HOME && \
     wget -O - $MJAI_SOURCE | tar zxf - mahjong-server-master/mjai -C $MJAI_HOME --strip-components=2
 
