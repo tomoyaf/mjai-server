@@ -14,7 +14,8 @@ RUN apk update && \
     gem install nokogiri -- --use-system-libraries --with-xml2-config=/usr/bin/xml2-config --with-xslt-config=/usr/bin/xslt-config && \
     gem install websocket-client-simple bundler sass && \
     mkdir -p $MJAI_HOME && \
-    wget -O - $MJAI_SOURCE | tar zxf - mahjong-server-master/mjai -C $MJAI_HOME --strip-components=2
+    wget -O - $MJAI_SOURCE | tar zxf - mahjong-server-master/mjai -C $MJAI_HOME --strip-components=2 && \
+    gem list
 
 WORKDIR $MJAI_HOME
 
