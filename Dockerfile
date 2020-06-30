@@ -9,7 +9,7 @@ EXPOSE 11600
 
 RUN apk update && \
     apk upgrade && \
-    apk add --no-cache build-base libxml2-dev libxslt-dev openssl ca-certificates wget build-essential patch zlib1g-dev liblzma-dev && \
+    apk add --no-cache build-base libxml2-dev libxslt-dev openssl ca-certificates wget curl-dev make gcc libc-dev g++ && \
     update-ca-certificates && \
     gem install websocket-client-simple bundler sass nokogiri && \
     mkdir -p $MJAI_HOME && \
