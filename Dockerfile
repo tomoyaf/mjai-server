@@ -11,10 +11,11 @@ RUN apk update && \
     apk upgrade && \
     apk add --no-cache build-base libxml2-dev libxslt-dev openssl ca-certificates wget && \
     update-ca-certificates && \
-    gem install websocket-client-simple bundler sass nokogiri && \
     mkdir -p $MJAI_HOME && \
     wget -O - $MJAI_SOURCE | tar zxf - mahjong-server-master/mjai -C $MJAI_HOME --strip-components=2
 
 WORKDIR $MJAI_HOME
+
+RUN bundle install
 
 CMD ["/bin/sh", "-c", "ruby ${MJAI_HOME}/bin/multisrv.rb"]
