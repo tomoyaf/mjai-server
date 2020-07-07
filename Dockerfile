@@ -3,7 +3,7 @@ FROM ruby:2.4.1-alpine3.6
 LABEL maintainer="tomoyaf"
 
 ENV MJAI_HOME /mjai
-ENV MJAI_SOURCE https://github.com/mahjong-server/mahjong-server/archive/master.tar.gz
+ENV MJAI_SOURCE https://github.com/tomoyaf/mahjong-server/archive/master.tar.gz
 
 EXPOSE 11600
 

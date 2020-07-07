@@ -4,6 +4,8 @@ import json
 import sys
 from urllib.parse import urlparse
 
+def dahai():
+    pass
 
 async def tcp_echo_client(loop, h, p):
     reader, writer = await asyncio.open_connection(h, p, loop=loop)
