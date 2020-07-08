@@ -1,55 +1,46 @@
-import asyncio
+from flask import Blueprint, request, abort, jsonify
 import json
-import sys
-from urllib.parse import urlparse
+from model import ActorCritic
 
-async def tcp_echo_client(loop, h, p):
-    reader, writer = await asyncio.open_connection(h, p, loop=loop)
-    while True:
-        data = await reader.readline()
-        received = json.loads(data.decode().strip())
+app = Flask(__name__)
 
-        print(f'in\t{received}')
+replay_buffer = []
+max_buffer_size = 100
+config = {}
+actor_critic = ActorCritic(config)
+is_new_policy_available = True
 
-        type = received['type']
+def serialize_model_parameter(m):
+    return json.dumps(m.state_dict())
 
-        if type == 'hello':
-            response = {
-                'type': 'join',
-                'name': 'tsumogiri',
-                'room': None
-            }
-        elif type == 'start_game':
-            id = received['id']
-            response = {'type': 'none'}
-        elif type == 'end_game':
-            break
-        elif type == 'tsumo':
-            if received['actor'] == id:
-                response = {
-                    'type': 'dahai',
-                    'actor': id,
-                    'pai': received['pai'],
-                    'tsumogiri': True,
-                }
-            else:
-                response = {'type': 'none'}
-        elif type == 'error':
-            break
-        else:
-            response = {'type': 'none'}
+@app.route('/experience', methods=['POST'])
+def post_experience():
+    is_new_policy_available = False
+    payload = request.json
+    state = payload.get('state')
+    next_state = payload.get('next_state')
+    reward = payload.get('reward')
+    action_prob_explore = payload.get('action_prob_explore')
+    replay_buffer.append({
+        'state': state,
+        'next_state': next_state,
+        'reward': reward,
+        'action_prob_explore': action_prob_explore
+    })
 
-        send_string = json.dumps(response, separators=(',', ':')) + '\n'
-        print(f'out\t{send_string}')
+    if len(replay_buffer) > max_buffer_size:
+        actor_critic.train(replay_buffer)
+        replay_buffer = []
 
-        writer.write(send_string.encode())
-        await writer.drain()
+    return 'success'
 
+@app.route('/policy/check', methods=['GET'])
+def check_policy_update():
+    return is_new_policy_available
 
-if __name__ == '__main__':
-    parsed = urlparse(sys.argv[1])
-    host, port = parsed.netloc.split(':')
+@app.route('/policy/latest', methods=['GET'])
+def get_latest_policy():
+    return serialize_model_parameter(actor_critic)
 
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(tcp_echo_client(loop, host, int(port)))
-    loop.close()
+if __name__ == "__main__":
+    app.run(debug=True)

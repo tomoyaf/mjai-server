@@ -3,8 +3,14 @@ import json
 import sys
 from urllib.parse import urlparse
 
-async def tcp_echo_client(loop, h, p):
-    reader, writer = await asyncio.open_connection(h, p, loop=loop)
+def check_policy_update(rb_host, rb_port):
+    pass
+
+def update_policy(rb_host, rb_port):
+    pass
+
+async def tcp_echo_client(loop, mj_host, mj_port):
+    reader, writer = await asyncio.open_connection(mj_host, mj_port, loop=loop)
     while True:
         data = await reader.readline()
         received = json.loads(data.decode().strip())
@@ -16,7 +22,7 @@ async def tcp_echo_client(loop, h, p):
         if type == 'hello':
             response = {
                 'type': 'join',
-                'name': 'tsumogiri',
+                'name': 'selfplay_agent',
                 'room': None
             }
         elif type == 'start_game':
@@ -46,10 +52,22 @@ async def tcp_echo_client(loop, h, p):
         await writer.drain()
 
 
-if __name__ == '__main__':
-    parsed = urlparse(sys.argv[1])
-    host, port = parsed.netloc.split(':')
 
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(tcp_echo_client(loop, host, int(port)))
-    loop.close()
+if __name__ == '__main__':
+    print(sys.argv)
+    parsed = [
+        urlparse(sys.argv[1]),
+        urlparse(sys.argv[2])
+    ]
+    mj_host, mj_port = parsed[0].netloc.split(':')
+    rb_host, rb_port = parsed[1].netloc.split(':')
+
+    while True:
+        if check_policy_update(rb_host, rb_port):
+            update_policy(rb_host, rb_port)
+
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(
+            tcp_echo_client(loop, mj_host, int(mj_port))
+        )
+        loop.close()
